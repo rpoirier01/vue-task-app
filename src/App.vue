@@ -21,6 +21,7 @@
 <script>
 import NewTaskButton from './components/NewTaskButton.vue';
 import Task from './components/Task.vue'
+import { getTasks, saveNewTask, deleteDBTask } from './requests';
 
 
 export default {
@@ -35,8 +36,21 @@ export default {
       tasks:[]
     }
   },
+  async created(){
+    try {
+      // this.tasks = await getTasks();
+      const response= await getTasks();
+      let newTasks=response.tasks;
+      for(let i=0;i<newTasks.length;i++){ //clean the tasks to just description
+        this.tasks.push(newTasks[i].description)
+      }
+    } catch(error){
+      console.error('Could not fetch tasks: ', error)
+    }
+  },
   methods:{
     addTask(task){
+      saveNewTask(task)
       this.tasks.push(task); //adds new task to the list
     },
     editTask(index){
@@ -49,6 +63,7 @@ export default {
       }
     },
     deleteTask(index){
+      deleteDBTask(this.tasks[index])
       this.tasks.splice(index, 1);
     }
   }
